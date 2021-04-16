@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi import Request
+import hashlib
 import time
 app = FastAPI()
 app.counter = 0
@@ -55,3 +56,17 @@ def method(request: Request):
 @app.post("/method", status_code=201)
 def method(request: Request):
     return {"method": request.method}
+
+
+@app.get("/auth/")
+def auth(response: Response, password: str = "normal", password_hash: str = "hashed"):
+
+    print(password)
+    hashed = hashlib.sha512(password.encode())
+    if hashed.hexdigest() == password_hash:
+        response.status_code = status.HTTP_204_NO_CONTENT
+    else:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+    return response.status_code
+
+
