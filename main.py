@@ -71,11 +71,11 @@ def method(request: Request):
 @app.get("/auth")
 def auth(response: Response, password: str, password_hash: str):
 
-    if response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return response.status_code
-
-    if len(password) == 0:
+    try:
+        if len(password) == 0:
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return response.status_code
+    except:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response.status_code
 
