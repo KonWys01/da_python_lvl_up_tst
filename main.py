@@ -3,7 +3,7 @@ from fastapi import Request
 import hashlib
 from datetime import date, timedelta
 from pydantic import BaseModel
-import json
+from urllib.error import HTTPError
 app = FastAPI()
 app.counter = 0
 
@@ -71,18 +71,15 @@ def method(request: Request):
 @app.get("/auth")
 def auth(response: Response, password: str, password_hash: str):
 
-    try:
-        if len(password) == 0:
-            response.status_code = status.HTTP_401_UNAUTHORIZED
-            return response.status_code
-
-        hashed = hashlib.sha512(password.encode())
-        if hashed.hexdigest() == password_hash:
-            response.status_code = status.HTTP_204_NO_CONTENT
-        else:
-            response.status_code = status.HTTP_401_UNAUTHORIZED
+    if len(password) == 0:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return response.status_code
-    except:
+
+    hashed = hashlib.sha512(password.encode())
+    if hashed.hexdigest() == password_hash:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response.status_code
+    else:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response.status_code
 
