@@ -8,6 +8,14 @@ app = FastAPI()
 app.counter = 0
 
 
+def number_of_letters(word):
+    result = 0
+    for character in word:
+        if character.isalpha():
+            result += 1
+    return result
+
+
 @app.get('/')
 def root():
     return {"message": "Hello world!"}
@@ -84,7 +92,7 @@ app.registration = dict()
 @app.post("/register")
 def register(response: Response, register_person: Register):
     register_date = date.today()
-    days_to_add = len(register_person.name) + len(register_person.surname)
+    days_to_add = number_of_letters(register_person.name) + number_of_letters(register_person.surname)
     vaccination_date = register_date + timedelta(days_to_add)
 
     app.id_counter += 1
