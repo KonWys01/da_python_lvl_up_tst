@@ -75,16 +75,16 @@ def auth(response: Response, password: str, password_hash: str):
         if len(password) == 0:
             response.status_code = status.HTTP_401_UNAUTHORIZED
             return response.status_code
+
+        hashed = hashlib.sha512(password.encode())
+        if hashed.hexdigest() == password_hash:
+            response.status_code = status.HTTP_204_NO_CONTENT
+        else:
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+        return response.status_code
     except:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response.status_code
-
-    hashed = hashlib.sha512(password.encode())
-    if hashed.hexdigest() == password_hash:
-        response.status_code = status.HTTP_204_NO_CONTENT
-    else:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-    return response.status_code
 
 
 class Register(BaseModel):
