@@ -1,7 +1,9 @@
 from fastapi import FastAPI, Response, status
 from fastapi import Request
 import hashlib
-import time
+from datetime import date, timedelta
+from pydantic import BaseModel
+import json
 app = FastAPI()
 app.counter = 0
 
@@ -58,7 +60,7 @@ def method(request: Request):
     return {"method": request.method}
 
 
-@app.get("/auth/")
+@app.get("/auth")
 def auth(response: Response, password: str = "normal", password_hash: str = "hashed"):
 
     print(password)
@@ -68,5 +70,48 @@ def auth(response: Response, password: str = "normal", password_hash: str = "has
     else:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     return response.status_code
+
+
+class Register(BaseModel):
+    name: str
+    surname: str
+
+
+app.id_counter = 0
+app.registration = dict()
+
+
+@app.post("/register")
+def register(response: Response, register_person: Register):
+    register_date = date.today()
+    days_to_add = len(register_person.name) + len(register_person.surname)
+    vaccination_date = register_date + timedelta(days_to_add)
+
+    app.id_counter += 1
+
+    response.status_code = status.HTTP_201_CREATED
+    data_of_person_to_be_registered = dict()
+    data_of_person_to_be_registered["id"] = app.id_counter
+    data_of_person_to_be_registered["name"] = register_person.name
+    data_of_person_to_be_registered["surname"] = register_person.surname
+    data_of_person_to_be_registered["register_date"] = register_date
+    data_of_person_to_be_registered["vaccination_date"] = vaccination_date
+    app.registration[app.id_counter] = data_of_person_to_be_registered
+
+    return data_of_person_to_be_registered
+
+
+@app.get("/patient/{id}")
+def patient(response: Response, id: int):
+    if id > app.id_counter:  # nie ma takiego pacjenta
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return response.status_code
+    elif id < 1:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return response.status_code
+
+    return app.registration[id]
+
+
 
 
