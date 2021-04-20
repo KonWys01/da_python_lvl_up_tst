@@ -69,12 +69,11 @@ def method(request: Request):
 
 
 @app.get("/auth")
-def auth(response: Response, password: str, password_hash: str):
+def auth(password: str, password_hash: str, response: Response):
 
-    if len(password) == 0:
+    if len(password) == 0 or len(password_hash) == 0:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response.status_code
-
     hashed = hashlib.sha512(password.encode())
     if hashed.hexdigest() == password_hash:
         response.status_code = status.HTTP_204_NO_CONTENT
