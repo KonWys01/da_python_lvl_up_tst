@@ -3,7 +3,7 @@ from fastapi import Request
 import hashlib
 from datetime import date, timedelta
 from pydantic import BaseModel
-from urllib.error import HTTPError
+import pytest
 app = FastAPI()
 app.counter = 0
 
@@ -69,7 +69,7 @@ def method(request: Request):
 
 
 @app.get("/auth")
-def auth(response: Response, password="", password_hash=""):
+def auth(response: Response, password: str = "", password_hash: str = ""):
 
     if len(password) == 0 or len(password_hash) == 0:
         response.status_code = status.HTTP_401_UNAUTHORIZED
@@ -124,5 +124,102 @@ def patient(response: Response, id: int):
     return app.registration[id]
 
 
+""" 2 wykład"""
+"""2.1"""
+def greetings(callable):
+    def inner(*args):
+        val = callable(*args)
+        val = val.lower()
+        result = ""
+        for word in val.split():
+            result += word.capitalize()
+            result += " "
+        result = result[:-1]
+        result = "Hello " + result
+        val = result
+        return result
+    return inner
+
+
+@greetings
+def name_surname(name):
+    return name
+
+
+print("result=")
+name_surname("joe doe")
+
+
+"""2.2"""
+def is_palindrome(callable):
+    def inner(*args):
+        val = callable(*args)
+        original_name = val
+        original_name = original_name.lower()
+        result = ""
+        for character in original_name:
+            if character.isalpha() or character.isnumeric():
+                result += character
+        if result == result[::-1]:
+            print(result, result[::-1], "                                      1")
+            return str(val + " - is palindrome")
+        else:
+            print(result, result[::-1], "                                      2")
+            return str(val + " - is not palindrome")
+    return inner
+
+
+@is_palindrome
+def sentence():
+    return "1111111111011111111111"
+
+
+sentence()
+print()
+
+
+"""2.3"""
+def format_output(*args):
+    list_of_arguments_double_floor = list(args)
+
+    def decorator(value_func):
+        def wrapper():  # w rozwiazaniu na stronie def wrapper(*args):
+            value = value_func()  # w rozwiazaniu na stronie value = value_func(args)
+            updated_keys_and_values = dict()
+
+            for element in list_of_arguments_double_floor:
+                updated_keys_and_values[element] = ''
+
+            for key in updated_keys_and_values.keys():
+                if '__' in key:  # ten klucz zawiera wiecej niz 1 klucz i trzeba rozdzielic
+                    for key_splitted in key.split('__'):
+                        if key_splitted in value.keys():
+                            updated_keys_and_values[key] += value[key_splitted]
+                            updated_keys_and_values[key] += ' '
+                        else:
+                            raise ValueError
+                    updated_keys_and_values[key] = updated_keys_and_values[key][:-1]  # usuwanie spacji w po ostatnim slowie
+                elif key in value.keys():
+                    updated_keys_and_values[key] += value[key]
+                else:
+                    raise ValueError
+            return updated_keys_and_values
+
+        return wrapper
+    return decorator
+
+
+@format_output("first_name", "age")
+def show_dict():
+    return {
+        "first_name": "Jan",
+        "last_name": "Kowalski",
+        "city": "Warszawa",
+    }
+
+print("only 1 wrapper")
+# print(show_dict())
+with pytest.raises(ValueError):
+    show_dict()
 
 
