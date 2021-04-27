@@ -16,22 +16,26 @@ def number_of_letters(word):
     return result
 
 
+# Wykład 1, zadanie 1.1
 @app.get('/')
 def root():
     return {"message": "Hello world!"}
 
 
+# Wykład 1
 @app.get("/hello/{name}")
 def hello_name_view(name: str):
     return f"Hello {name}"
 
 
+# Wykład 1
 @app.get("/counter")
 def counter():
     app.counter += 1
     return app.counter
 
 
+# Wyklad 1, zadanie 1.2 metoda na debila
 """
 @app.get("/method")
 def method():
@@ -58,16 +62,19 @@ def method():
     return {"method": "OPTIONS"}"""
 
 
+# Wyklad 1, zadanie 1.2
 @app.api_route("/method", methods=["GET", 'DELETE', 'PUT', 'OPTIONS'])
 def method(request: Request):
     return {"method": request.method}
 
 
+# Wyklad 1, zadanie 1.2 ciag dalszy
 @app.post("/method", status_code=201)
 def method(request: Request):
     return {"method": request.method}
 
 
+# Wyklad 1, zadanie 1.3
 @app.get("/auth")
 def auth(response: Response, password: str = "", password_hash: str = ""):
 
@@ -83,6 +90,7 @@ def auth(response: Response, password: str = "", password_hash: str = ""):
         return response.status_code
 
 
+# Wyklad 1, zadanie 1.4
 class Register(BaseModel):
     name: str
     surname: str
@@ -112,6 +120,7 @@ def register(response: Response, register_person: Register):
     return data_of_person_to_be_registered
 
 
+# Wyklad 1, zadanie 1.5
 @app.get("/patient/{id}")
 def patient(response: Response, id: int):
     if id > app.id_counter:  # nie ma takiego pacjenta
@@ -124,8 +133,7 @@ def patient(response: Response, id: int):
     return app.registration[id]
 
 
-""" 2 wykład"""
-"""2.1"""
+# Wyklad 2, zadanie 2.1
 def greetings(callable):
     def inner(*args):
         val = callable(*args)
@@ -150,7 +158,7 @@ print("result=")
 name_surname("joe doe")
 
 
-"""2.2"""
+# Wyklad 2, zadanie 2.2
 def is_palindrome(callable):
     def inner(*args):
         val = callable(*args)
@@ -161,10 +169,8 @@ def is_palindrome(callable):
             if character.isalpha() or character.isnumeric():
                 result += character
         if result == result[::-1]:
-            print(result, result[::-1], "                                      1")
             return str(val + " - is palindrome")
         else:
-            print(result, result[::-1], "                                      2")
             return str(val + " - is not palindrome")
     return inner
 
@@ -178,7 +184,7 @@ sentence()
 print()
 
 
-"""2.3"""
+# Wyklad 2, zadanie 2.3
 def format_output(*args):
     list_of_arguments_double_floor = list(args)
 
@@ -221,5 +227,51 @@ print("only 1 wrapper")
 # print(show_dict())
 with pytest.raises(ValueError):
     show_dict()
+
+
+# Wyklad 2, zadanie 2.4 a)
+class ExampleClass:
+    pass
+
+
+def add_class_method(ExampleClass):
+    def wrapper(function):
+        setattr(ExampleClass, function.__name__, function)
+        return function
+    return wrapper
+
+
+@add_class_method(ExampleClass)
+def foo():
+    return "siemanko"
+
+
+ExampleClass.foo()
+foo()
+
+
+# Wyklad 2, zadanie 2.4 b)
+def add_instance_method(ExampleClass):
+    def decorator(func):
+        def wrapper(self, *args, **kwargs):
+            return func(*args, **kwargs)
+        setattr(ExampleClass, func.__name__, wrapper)
+        return func
+    return decorator
+
+
+@add_instance_method(ExampleClass)
+def bar():
+    return "Hello again!"
+
+
+# No trickery. Class A has no methods nor variables.
+a = ExampleClass()
+a.bar()
+
+
+
+
+
 
 
