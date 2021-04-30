@@ -307,6 +307,7 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
     if credentials.username != "4dm1n" or credentials.password != "NotSoSecurePa$$":
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
     else:
+        resposne.status_code = status.HTTP_200_OK
         resposne.set_cookie(key="session_token", value="siemanko-jedzonko")
 
 
@@ -315,6 +316,7 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
     if credentials.username != "4dm1n" or credentials.password != "NotSoSecurePa$$":
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
     else:
+        resposne.status_code = status.HTTP_200_OK
         token_value = "dwa"
         global token
         token = token_value
