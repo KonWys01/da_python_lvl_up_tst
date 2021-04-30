@@ -4,6 +4,7 @@ import hashlib
 from datetime import date, timedelta
 from pydantic import BaseModel
 import pytest
+from fastapi.responses import HTMLResponse
 app = FastAPI()
 app.counter = 0
 
@@ -149,6 +150,14 @@ def greetings(callable):
     return inner
 
 
+# rozwiazanie pawła
+"""def greetings(callable):
+    def inner(*args):
+        Iname = callable(*args).title()
+        return "Hello" + Iname
+    return inner"""
+
+
 @greetings
 def name_surname(name):
     return name
@@ -156,6 +165,7 @@ def name_surname(name):
 
 print("result=")
 name_surname("joe doe")
+print(name_surname("joe doe"))
 
 
 # Wyklad 2, zadanie 2.2
@@ -270,8 +280,16 @@ a = ExampleClass()
 a.bar()
 
 
-
-
-
-
-
+@app.get('/hello', response_class=HTMLResponse)
+def hello():
+    todays_date = date.today()
+    return f"""
+        <html>
+            <head>
+                <title>have no idea whether it works</title>
+            </head>
+            <body>
+                <h1>Hello! Today date is {todays_date.year}-{todays_date.month}-{todays_date.day}</h1>
+            </body>
+        </html>
+        """
