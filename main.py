@@ -5,7 +5,12 @@ from datetime import date, timedelta
 from pydantic import BaseModel
 import pytest
 from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi import Depends
+
+
 app = FastAPI()
+security = HTTPBasic()
 app.counter = 0
 
 
@@ -292,3 +297,26 @@ def hello():
             </body>
         </html>
         """
+
+
+token = "siema"
+
+
+@app.post("/login_session")
+def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    if credentials.username != "4dm1n" or credentials.password != "NotSoSecurePa$$":
+        resposne.status_code = status.HTTP_401_UNAUTHORIZED
+    else:
+        resposne.set_cookie(key="session_token", value="siemanko-jedzonko")
+
+
+@app.post("/login_token")
+def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    if credentials.username != "4dm1n" or credentials.password != "NotSoSecurePa$$":
+        resposne.status_code = status.HTTP_401_UNAUTHORIZED
+    else:
+        token_value = "dwa"
+        global token
+        token = token_value
+        return {"token": token_value}
+
