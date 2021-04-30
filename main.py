@@ -275,21 +275,20 @@ def bar():
     return "Hello again!"
 
 
-# No trickery. Class A has no methods nor variables.
-a = ExampleClass()
-a.bar()
+# wywołanie funkcji bar dla obiektu klasy ExampleClass
+# a = ExampleClass()
+# a.bar()
 
 
 @app.get('/hello', response_class=HTMLResponse)
 def hello():
-    todays_date = date.today()
     return f"""
         <html>
             <head>
                 <title>have no idea whether it works</title>
             </head>
             <body>
-                <h1>Hello! Today date is {todays_date.year}-{todays_date.month}-{todays_date.day}</h1>
+                <h1>Hello! Today date is 2021-04-30</h1>
             </body>
         </html>
         """
