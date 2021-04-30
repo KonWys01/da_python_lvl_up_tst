@@ -256,8 +256,8 @@ def foo():
     return "siemanko"
 
 
-ExampleClass.foo()
-foo()
+# ExampleClass.foo()
+# foo()
 
 
 # Wyklad 2, zadanie 2.4 b)
