@@ -341,5 +341,5 @@ def secured_data(*, response: Response, session_token: str = Cookie(None)):
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         response.status_code = status.HTTP_200_OK
-        return str("Welcome!")
+        return str('Welcome!')
 
