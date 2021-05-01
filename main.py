@@ -299,26 +299,29 @@ def hello():
         """
 
 
-token = "siema"
+token_login_session = "session"
+token_login_token = "token"
+import http.cookies
 
 
-@app.post("/login_session")
+@app.post("/login_session", status_code=201)
 def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username != "4dm1n" or credentials.password != "NotSoSecurePa$$":
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
     else:
-        resposne.status_code = status.HTTP_200_OK
         resposne.set_cookie(key="session_token", value="siemanko-jedzonko")
+        global token_login_session
+        token_login_session = "siemanko-jedzonko"
+        return resposne
 
 
-@app.post("/login_token")
+@app.post("/login_token", status_code=201)
 def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username != "4dm1n" or credentials.password != "NotSoSecurePa$$":
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
     else:
-        resposne.status_code = status.HTTP_200_OK
         token_value = "dwa"
-        global token
-        token = token_value
+        global token_login_token
+        token_login_token = token_value
         return {"token": token_value}
 
