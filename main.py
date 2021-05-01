@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Response, status, Cookie
 from fastapi import Request
 import hashlib
 from datetime import date, timedelta
@@ -299,22 +299,25 @@ def hello():
         """
 
 
+app.secret_key = "aidbskgbdklgbnsdkgjbdgkjdbgfkd"
+app.access_tokens = []
 token_login_session = "session"
 token_login_token = "token"
-import http.cookies
 
 
 @app.post("/login_session")
 def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = Depends(security)):
-    if len(credentials.username) == 0 or len(credentials.password) == 0:
+    user = credentials.username
+    password = credentials.password
+    if len(user) == 0 or len(password) == 0:
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
-    if credentials.username != "4dm1n" or credentials.password != "NotSoSecurePa$$":
+    if user != "4dm1n" or password != "NotSoSecurePa$$":
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
     else:
+        session_token = hashlib.sha512(f"{user}{password}{app.secret_key}".encode()).hexdigest()
+        app.access_tokens.append(session_token)
+        resposne.set_cookie(key="session_token", value=session_token)
         resposne.status_code = status.HTTP_201_CREATED
-        resposne.set_cookie(key="session_token", value="siemanko-jedzonko")
-        global token_login_session
-        token_login_session = "siemanko-jedzonko"
         return resposne
 
 
@@ -330,4 +333,13 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
         global token_login_token
         token_login_token = token_value
         return {"token": token_value}
+
+
+@app.get("/welcome_session")
+def secured_data(*, response: Response, session_token: str = Cookie(None)):
+    if session_token not in app.access_tokens:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+    else:
+        response.status_code = status.HTTP_200_OK
+        return "Welcome!"
 
