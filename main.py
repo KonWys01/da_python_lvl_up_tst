@@ -1,13 +1,13 @@
 from fastapi import FastAPI, Response, status, Cookie
 from fastapi import Request
-import hashlib
-from datetime import date, timedelta
-from pydantic import BaseModel
-import pytest
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends
 
+import hashlib
+from datetime import date, timedelta
+from pydantic import BaseModel
+import pytest
 
 app = FastAPI()
 security = HTTPBasic()
@@ -314,7 +314,7 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
     if user != "4dm1n" or password != "NotSoSecurePa$$":
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
     else:
-        session_token = hashlib.sha512(f"{user}{password}{app.secret_key}".encode()).hexdigest()
+        session_token = hashlib.sha256(f"{user}{password}{app.secret_key}".encode()).hexdigest()
         app.access_tokens.append(session_token)
         resposne.set_cookie(key="session_token", value=session_token)
         resposne.status_code = status.HTTP_201_CREATED
@@ -323,9 +323,11 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
 
 @app.post("/login_token")
 def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = Depends(security)):
-    if len(credentials.username) == 0 or len(credentials.password) == 0:
+    user = credentials.username
+    password = credentials.password
+    if len(user) == 0 or len(password) == 0:
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
-    if credentials.username != "4dm1n" or credentials.password != "NotSoSecurePa$$":
+    if user != "4dm1n" or password != "NotSoSecurePa$$":
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         resposne.status_code = status.HTTP_201_CREATED
@@ -343,3 +345,25 @@ def secured_data(*, response: Response, session_token: str = Cookie(None)):
         response.status_code = status.HTTP_200_OK
         return 'Welcome!'
 
+
+@app.get("/welcome_token")
+def secured_data(response: Response, token: str="", format: str=""):
+    if token not in app.access_tokens:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+    else:
+        response.status_code = status.HTTP_200_OK
+        if format == "json":
+            return {"message": "Welcome!"}
+        elif format == "html":
+            return f"""
+                    <html>
+                        <head>
+                            <title>have no idea whether it works</title>
+                        </head>
+                        <body>
+                            <h1>Welcome!</h1>
+                        </body>
+                    </html>
+                    """
+        else:
+            return 'Welcome'
