@@ -408,7 +408,7 @@ def logout_session(*, response: Response, session_token: str = Cookie(None), for
     else:
         app.login_session_tokens.clear()
         response.status_code = status.HTTP_302_FOUND
-        return RedirectResponse(f"https://https://da-first-homework-2021.herokuapp.com/logged_out?{session_token}&{format}"
+        return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?{session_token}&{format}"
                                 , status_code=303)
 @app.delete("/logout_token")
 def logout_session(response : Response, token: str = "", format: str = ""):
@@ -417,7 +417,7 @@ def logout_session(response : Response, token: str = "", format: str = ""):
     else:
         app.login_token_tokens.clear()
         response.status_code = status.HTTP_302_FOUND
-        return RedirectResponse(f"https://https://da-first-homework-2021.herokuapp.com/logged_out?{token}&{format}"
+        return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?{token}&{format}"
                                 ,status_code=303)
 
 @app.get("/logged_out")
