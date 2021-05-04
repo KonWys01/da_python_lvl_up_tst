@@ -338,13 +338,30 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
 
 
 @app.get("/welcome_session")
-def welcome_session(*, response: Response, session_token: str = Cookie(None)):
+def welcome_session(*, response: Response, session_token: str = Cookie(None), format: str = ""):
     if session_token not in app.login_session_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response
     else:
         response.status_code = status.HTTP_200_OK
-        return 'Welcome!'
+        if format == "":
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return response
+        elif format == "json":
+            return {"message": "Welcome!"}
+        elif format == "html":
+            return f"""
+                            <html>
+                                <head>
+                                    <title>have no idea whether it works</title>
+                                </head>
+                                <body>
+                                    <h1>Welcome!</h1>
+                                </body>
+                            </html>
+                            """
+        else:
+            return 'Welcome'
 
 
 @app.get("/welcome_token")
