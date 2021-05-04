@@ -5,7 +5,8 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends
 from fastapi.responses import PlainTextResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi import HTTPException
-
+import random
+import string
 
 import hashlib
 from datetime import date, timedelta
@@ -302,6 +303,12 @@ def hello():
         """
 
 
+def get_random_string():
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(30))
+    return result_str
+
+
 security = HTTPBasic()
 app.secret_key = "aidbskgbdklgbnsdkgjbdgkjdbgfkd"
 app.login_session_tokens = []
@@ -319,7 +326,10 @@ def read_current_user(response: Response, credentials: HTTPBasicCredentials = De
     if user != "4dm1n" or password != "NotSoSecurePa$$":
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
-        session_token = hashlib.sha256(f"{user}{password}{app.secret_key}".encode()).hexdigest()
+        session_token = get_random_string()
+        # maksymalnie 3 użytkowników
+        if len(app.login_session_tokens) == 3:
+            app.login_session_tokens.pop(0)
         app.login_session_tokens.append(session_token)
         response.set_cookie(key="session_token", value=session_token)
         response.status_code = status.HTTP_201_CREATED
@@ -336,7 +346,11 @@ def read_current_user(response: Response, credentials: HTTPBasicCredentials = De
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         response.status_code = status.HTTP_201_CREATED
-        token_value = "dwa"
+        token_value = get_random_string()
+        # maksymalnie 3 użytkowników
+        if len(app.login_token_tokens) == 3:
+            app.login_token_tokens.pop(0)
+
         app.login_token_tokens.append(token_value)
         return {"token": token_value}
 
@@ -410,8 +424,10 @@ def logout_session(*, response: Response, session_token: str = Cookie(None), for
         response.status_code = status.HTTP_302_FOUND
         return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?token={session_token}&format={format}"
                                 , status_code=303)
+
+
 @app.delete("/logout_token")
-def logout_session(response : Response, token: str = "", format: str = ""):
+def logout_session(response: Response, token: str = "", format: str = ""):
     if token not in app.login_token_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
@@ -420,8 +436,9 @@ def logout_session(response : Response, token: str = "", format: str = ""):
         return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?token={token}&format={format}"
                                 ,status_code=303)
 
+
 @app.get("/logged_out")
-def logged_out(response: Response, format: str=""):
+def logged_out(response: Response, format: str = ""):
     if format == "":
         result = "Logged out!"
         return PlainTextResponse(content=result, status_code=200)
