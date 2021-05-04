@@ -420,7 +420,9 @@ def logout_session(*, response: Response, session_token: str = Cookie(None), for
     if session_token not in app.login_session_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
-        app.login_session_tokens.clear()
+        for i in range(len(app.login_session_tokens)):
+            if app.login_session_tokens[i] == session_token:
+                app.login_session_tokens.pop(i)
         response.status_code = status.HTTP_302_FOUND
         return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?token={session_token}&format={format}"
                                 , status_code=303)
@@ -431,7 +433,9 @@ def logout_session(response: Response, token: str = "", format: str = ""):
     if token not in app.login_token_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
-        app.login_token_tokens.clear()
+        for i in range(len(app.login_token_tokens)):
+            if app.login_token_tokens[i] == token:
+                app.login_token_tokens.pop(i)
         response.status_code = status.HTTP_302_FOUND
         return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?token={token}&format={format}"
                                 ,status_code=303)
