@@ -338,7 +338,7 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
 
 @app.get("/welcome_session")
 def welcome_session(*, response: Response, session_token: str = Cookie(None)):
-    if session_token not in app.access_tokens:
+    if session_token not in app.access_tokens or session_token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         response.status_code = status.HTTP_200_OK
@@ -347,7 +347,7 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None)):
 
 @app.get("/welcome_token")
 def welcome_token(response: Response, token: str = "", format: str = ""):
-    if token not in app.access_tokens:
+    if token not in app.access_tokens or token == "":
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         response.status_code = status.HTTP_200_OK
