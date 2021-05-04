@@ -423,6 +423,7 @@ def logout_session(*, response: Response, session_token: str = Cookie(None), for
         for i in range(len(app.login_session_tokens)):
             if app.login_session_tokens[i] == session_token:
                 app.login_session_tokens.pop(i)
+                break
         response.status_code = status.HTTP_302_FOUND
         return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?token={session_token}&format={format}"
                                 , status_code=303)
@@ -436,6 +437,7 @@ def logout_session(response: Response, token: str = "", format: str = ""):
         for i in range(len(app.login_token_tokens)):
             if app.login_token_tokens[i] == token:
                 app.login_token_tokens.pop(i)
+                break
         response.status_code = status.HTTP_302_FOUND
         return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?token={token}&format={format}"
                                 ,status_code=303)
