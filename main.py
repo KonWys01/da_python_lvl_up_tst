@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends
 from fastapi.responses import PlainTextResponse, HTMLResponse, JSONResponse, RedirectResponse
+from fastapi import HTTPException
 
 
 import hashlib
@@ -400,31 +401,27 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
             return PlainTextResponse(content=result, status_code=200)
 
 
-@app.delete("logout_session")
+@app.delete("/logout_session")
 def logout_session(*, response: Response, session_token: str = Cookie(None), format: str = ""):
     if session_token not in app.login_session_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return response
     else:
-        app.login_session_tokens = []
+        app.login_session_tokens.clear()
         response.status_code = status.HTTP_302_FOUND
-        return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?{session_token}&{format}", status_code=303)
-
-
-@app.delete("logout_tokens")
-def welcome_token(response: Response, token: str = "", format: str = ""):
+        return RedirectResponse(f"https://https://da-first-homework-2021.herokuapp.com/logged_out?{session_token}&{format}"
+                                , status_code=303)
+@app.delete("/logout_token")
+def logout_session(response : Response, token: str = "", format: str = ""):
     if token not in app.login_token_tokens:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return response
+        raise HTTPException(status_code=401, detail="unathorized session")
     else:
-        app.login_token_tokens = []
+        app.login_token_tokens.clear()
         response.status_code = status.HTTP_302_FOUND
-        return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?{token}&{format}", status_code=303)
+        return RedirectResponse(f"https://https://da-first-homework-2021.herokuapp.com/logged_out?{token}&{format}"
+                                ,status_code=303)
 
-
-@app.get("logged_out")
-def logout_session(*, response: Response, format: str = ""):
-    response.status_code = status.HTTP_200_OK
+@app.get("/logged_out")
+def logged_out(response: Response, format: str=""):
     if format == "":
         result = "Logged out!"
         return PlainTextResponse(content=result, status_code=200)
@@ -433,15 +430,12 @@ def logout_session(*, response: Response, format: str = ""):
         return JSONResponse(content=result, status_code=200)
     elif format == "html":
         html = f"""
-                        <html>
-                            <head>
-                                <title>have no idea whether it works</title>
-                            </head>
-                            <body>
-                                <h1>Logged out!</h1>
-                            </body>
-                        </html>
-                        """
+                <html>
+                    <body>
+                        <h1>Logged out!</h1>
+                    </body>
+                </html>
+                """
         return HTMLResponse(content=html, status_code=200)
     else:
         result = "Logged out!"
