@@ -3,6 +3,7 @@ from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends
+from fastapi.responses import PlainTextResponse
 
 import hashlib
 from datetime import date, timedelta
@@ -337,7 +338,7 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
         return {"token": token_value}
 
 
-@app.get("/welcome_session")
+@app.get("/welcome_session", response_class=PlainTextResponse)
 def welcome_session(*, response: Response, session_token: str = Cookie(None), format: str = ""):
     if session_token not in app.login_session_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
@@ -363,7 +364,7 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None), fo
             return 'Welcome'
 
 
-@app.get("/welcome_token")
+@app.get("/welcome_token", response_class=PlainTextResponse)
 def welcome_token(response: Response, token: str = "", format: str = ""):
     if token not in app.login_token_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
