@@ -3,12 +3,13 @@ from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, HTMLResponse, ORJSONResponse
 
 import hashlib
 from datetime import date, timedelta
 from pydantic import BaseModel
 import pytest
+import json
 
 app = FastAPI()
 app.counter = 0
@@ -338,11 +339,6 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
         return {"token": token_value}
 
 
-@app.get(response_class=PlainTextResponse)
-def plain_text():
-    return "Welcome!"
-
-
 @app.get("/welcome_session")
 def welcome_session(*, response: Response, session_token: str = Cookie(None), format: str = ""):
     if session_token not in app.login_session_tokens:
@@ -351,22 +347,26 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None), fo
     else:
         response.status_code = status.HTTP_200_OK
         if format == "":
-            return plain_text()
+            result = "Welcome!"
+            return PlainTextResponse(content=result)
         elif format == "json":
-            return {"message": "Welcome!"}
+            result = {"message": "Welcome!"}
+            return ORJSONResponse(content=result)
         elif format == "html":
-            return f"""
-                            <html>
-                                <head>
-                                    <title>have no idea whether it works</title>
-                                </head>
-                                <body>
-                                    <h1>Welcome!</h1>
-                                </body>
-                            </html>
-                            """
+            html = f"""
+                    <html>
+                        <head>
+                            <title>have no idea whether it works</title>
+                        </head>
+                        <body>
+                            <h1>Welcome!</h1>
+                        </body>
+                    </html>
+                    """
+            return HTMLResponse(content=html)
         else:
-            return 'Welcome'
+            result = "Welcome!"
+            return PlainTextResponse(content=result)
 
 
 @app.get("/welcome_token")
@@ -377,11 +377,13 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
     else:
         response.status_code = status.HTTP_200_OK
         if format == "":
-            return plain_text()
+            result = "Welcome!"
+            return PlainTextResponse(content=result)
         elif format == "json":
-            return {"message": "Welcome!"}
+            result = {"message": "Welcome!"}
+            return ORJSONResponse(content=result)
         elif format == "html":
-            return f"""
+            html= f"""
                     <html>
                         <head>
                             <title>have no idea whether it works</title>
@@ -391,5 +393,7 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
                         </body>
                     </html>
                     """
+            return HTMLResponse(content=html)
         else:
-            return 'Welcome'
+            result = "Welcome!"
+            return PlainTextResponse(content=result)
