@@ -10,7 +10,6 @@ from pydantic import BaseModel
 import pytest
 
 app = FastAPI()
-security = HTTPBasic()
 app.counter = 0
 
 
@@ -299,6 +298,7 @@ def hello():
         """
 
 
+security = HTTPBasic()
 app.secret_key = "aidbskgbdklgbnsdkgjbdgkjdbgfkd"
 app.access_tokens = []
 token_login_session = "session"
@@ -332,13 +332,12 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
     else:
         resposne.status_code = status.HTTP_201_CREATED
         token_value = "dwa"
-        global token_login_token
-        token_login_token = token_value
+        app.access_tokens.append(token_value)
         return {"token": token_value}
 
 
 @app.get("/welcome_session")
-def secured_data(*, response: Response, session_token: str = Cookie(None)):
+def welcome_session(*, response: Response, session_token: str = Cookie(None)):
     if session_token not in app.access_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
@@ -347,7 +346,7 @@ def secured_data(*, response: Response, session_token: str = Cookie(None)):
 
 
 @app.get("/welcome_token")
-def secured_data(response: Response, token: str="", format: str=""):
+def welcome_token(response: Response, token: str = "", format: str = ""):
     if token not in app.access_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
