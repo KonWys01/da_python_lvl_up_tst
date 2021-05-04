@@ -3,7 +3,7 @@ from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends
-from fastapi.responses import PlainTextResponse, HTMLResponse, ORJSONResponse
+from fastapi.responses import PlainTextResponse, HTMLResponse, JSONResponse
 
 import hashlib
 from datetime import date, timedelta
@@ -351,7 +351,7 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None), fo
             return PlainTextResponse(content=result, status_code=200)
         elif format == "json":
             result = {"message": "Welcome!"}
-            return ORJSONResponse(content=result, status_code=200)
+            return JSONResponse(content=result, status_code=200)
         elif format == "html":
             html = f"""
                     <html>
@@ -378,10 +378,10 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
         response.status_code = status.HTTP_200_OK
         if format == "":
             result = "Welcome!"
-            return PlainTextResponse(content=result)
+            return PlainTextResponse(content=result, status_code=200)
         elif format == "json":
             result = {"message": "Welcome!"}
-            return ORJSONResponse(content=result)
+            return JSONResponse(content=result, status_code=200)
         elif format == "html":
             html= f"""
                     <html>
@@ -393,7 +393,7 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
                         </body>
                     </html>
                     """
-            return HTMLResponse(content=html)
+            return HTMLResponse(content=html, status_code=200)
         else:
             result = "Welcome!"
-            return PlainTextResponse(content=result)
+            return PlainTextResponse(content=result, status_code=200)
