@@ -348,10 +348,10 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None), fo
         response.status_code = status.HTTP_200_OK
         if format == "":
             result = "Welcome!"
-            return PlainTextResponse(content=result)
+            return PlainTextResponse(content=result, status_code=200)
         elif format == "json":
             result = {"message": "Welcome!"}
-            return ORJSONResponse(content=result)
+            return ORJSONResponse(content=result, status_code=200)
         elif format == "html":
             html = f"""
                     <html>
@@ -363,10 +363,10 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None), fo
                         </body>
                     </html>
                     """
-            return HTMLResponse(content=html)
+            return HTMLResponse(content=html, status_code=200)
         else:
             result = "Welcome!"
-            return PlainTextResponse(content=result)
+            return PlainTextResponse(content=result, status_code=200)
 
 
 @app.get("/welcome_token")
