@@ -3,7 +3,8 @@ from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends
-from fastapi.responses import PlainTextResponse, HTMLResponse, JSONResponse
+from fastapi.responses import PlainTextResponse, HTMLResponse, JSONResponse, RedirectResponse
+
 
 import hashlib
 from datetime import date, timedelta
@@ -309,31 +310,31 @@ token_login_token = "token"
 
 
 @app.post("/login_session")
-def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = Depends(security)):
+def read_current_user(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     user = credentials.username
     password = credentials.password
     if len(user) == 0 or len(password) == 0:
-        resposne.status_code = status.HTTP_401_UNAUTHORIZED
+        response.status_code = status.HTTP_401_UNAUTHORIZED
     if user != "4dm1n" or password != "NotSoSecurePa$$":
-        resposne.status_code = status.HTTP_401_UNAUTHORIZED
+        response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         session_token = hashlib.sha256(f"{user}{password}{app.secret_key}".encode()).hexdigest()
         app.login_session_tokens.append(session_token)
-        resposne.set_cookie(key="session_token", value=session_token)
-        resposne.status_code = status.HTTP_201_CREATED
-        return resposne
+        response.set_cookie(key="session_token", value=session_token)
+        response.status_code = status.HTTP_201_CREATED
+        return response
 
 
 @app.post("/login_token")
-def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = Depends(security)):
+def read_current_user(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     user = credentials.username
     password = credentials.password
     if len(user) == 0 or len(password) == 0:
-        resposne.status_code = status.HTTP_401_UNAUTHORIZED
+        response.status_code = status.HTTP_401_UNAUTHORIZED
     if user != "4dm1n" or password != "NotSoSecurePa$$":
-        resposne.status_code = status.HTTP_401_UNAUTHORIZED
+        response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
-        resposne.status_code = status.HTTP_201_CREATED
+        response.status_code = status.HTTP_201_CREATED
         token_value = "dwa"
         app.login_token_tokens.append(token_value)
         return {"token": token_value}
@@ -397,3 +398,49 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
         else:
             result = "Welcome!"
             return PlainTextResponse(content=result, status_code=200)
+
+
+@app.delete("logout_session")
+def logout_session(*, response: Response, session_token: str = Cookie(None), format: str = ""):
+    if session_token not in app.login_session_tokens:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return response
+    else:
+        app.login_session_tokens.clear()
+
+
+@app.delete("logout_tokens")
+def welcome_token(response: Response, token: str = "", format: str = ""):
+    if token not in app.login_token_tokens:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return response
+    else:
+        app.login_token_tokens.clear()
+        response.status_code = status.HTTP_302_FOUND
+        return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out/?token={token}&format={format}")
+
+
+@app.get("logged_out")
+def logout_session(*, response: Response, session_token: str = "", format: str = ""):
+    response.status_code = status.HTTP_200_OK
+    if format == "":
+        result = "Logged out!"
+        return PlainTextResponse(content=result, status_code=200)
+    elif format == "json":
+        result = {"message": "Logged out!"}
+        return JSONResponse(content=result, status_code=200)
+    elif format == "html":
+        html = f"""
+                        <html>
+                            <head>
+                                <title>have no idea whether it works</title>
+                            </head>
+                            <body>
+                                <h1>Logged out!</h1>
+                            </body>
+                        </html>
+                        """
+        return HTMLResponse(content=html, status_code=200)
+    else:
+        result = "Logged out!"
+        return PlainTextResponse(content=result, status_code=200)
