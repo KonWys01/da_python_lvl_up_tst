@@ -417,7 +417,7 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
     else:
         app.login_token_tokens.clear()
         response.status_code = status.HTTP_302_FOUND
-        return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out/?token={token}&format={format}")
+        return RedirectResponse(f"https://da-first-homework-2021.herokuapp.com/logged_out?token={token}&format={format}")
 
 
 @app.get("logged_out")
