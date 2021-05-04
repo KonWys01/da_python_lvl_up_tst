@@ -413,7 +413,7 @@ def logout_session(*, response: Response, session_token: str = Cookie(None), for
 @app.delete("/logout_token")
 def logout_session(response : Response, token: str = "", format: str = ""):
     if token not in app.login_token_tokens:
-        raise HTTPException(status_code=401, detail="unathorized session")
+        response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         app.login_token_tokens.clear()
         response.status_code = status.HTTP_302_FOUND
