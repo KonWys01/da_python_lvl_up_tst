@@ -300,7 +300,8 @@ def hello():
 
 security = HTTPBasic()
 app.secret_key = "aidbskgbdklgbnsdkgjbdgkjdbgfkd"
-app.access_tokens = []
+app.login_session_tokens = []
+app.login_token_tokens = []
 token_login_session = "session"
 token_login_token = "token"
 
@@ -315,7 +316,7 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
         resposne.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         session_token = hashlib.sha256(f"{user}{password}{app.secret_key}".encode()).hexdigest()
-        app.access_tokens.append(session_token)
+        app.login_session_tokens.append(session_token)
         resposne.set_cookie(key="session_token", value=session_token)
         resposne.status_code = status.HTTP_201_CREATED
         return resposne
@@ -332,13 +333,13 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
     else:
         resposne.status_code = status.HTTP_201_CREATED
         token_value = "dwa"
-        app.access_tokens.append(token_value)
+        app.login_token_tokens.append(token_value)
         return {"token": token_value}
 
 
 @app.get("/welcome_session")
 def welcome_session(*, response: Response, session_token: str = Cookie(None)):
-    if session_token not in app.access_tokens or session_token is None:
+    if session_token not in app.login_session_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         response.status_code = status.HTTP_200_OK
@@ -347,7 +348,7 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None)):
 
 @app.get("/welcome_token")
 def welcome_token(response: Response, token: str = "", format: str = ""):
-    if token not in app.access_tokens or token == "":
+    if token not in app.login_token_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     else:
         response.status_code = status.HTTP_200_OK
