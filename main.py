@@ -345,8 +345,7 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None), fo
     else:
         response.status_code = status.HTTP_200_OK
         if format == "":
-            response.status_code = status.HTTP_401_UNAUTHORIZED
-            return response
+            return 'Welcome'
         elif format == "json":
             return {"message": "Welcome!"}
         elif format == "html":
@@ -372,8 +371,7 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
     else:
         response.status_code = status.HTTP_200_OK
         if format == "":
-            response.status_code = status.HTTP_401_UNAUTHORIZED
-            return response
+            return 'Welcome'
         elif format == "json":
             return {"message": "Welcome!"}
         elif format == "html":
