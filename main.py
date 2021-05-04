@@ -341,6 +341,7 @@ def read_current_user(resposne: Response, credentials: HTTPBasicCredentials = De
 def welcome_session(*, response: Response, session_token: str = Cookie(None)):
     if session_token not in app.login_session_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
+        return response
     else:
         response.status_code = status.HTTP_200_OK
         return 'Welcome!'
@@ -350,9 +351,13 @@ def welcome_session(*, response: Response, session_token: str = Cookie(None)):
 def welcome_token(response: Response, token: str = "", format: str = ""):
     if token not in app.login_token_tokens:
         response.status_code = status.HTTP_401_UNAUTHORIZED
+        return response
     else:
         response.status_code = status.HTTP_200_OK
-        if format == "json":
+        if format == "":
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return response
+        elif format == "json":
             return {"message": "Welcome!"}
         elif format == "html":
             return f"""
