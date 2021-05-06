@@ -470,7 +470,7 @@ def logged_out(response: Response, format: str = ""):
 @app.on_event("startup")
 async def startup():
     app.db_connection = await aiosqlite.connect("northwind.db")
-    # app.db_connection.text_factory = lambda b: b.decode(errors="ignore")  # northwind specific
+    app.db_connection.text_factory = lambda b: b.decode(errors="ignore")  # northwind specific
 
 
 @app.on_event("shutdown")
@@ -491,5 +491,5 @@ async def products(response: Response, id: int):
         return response
     cursor = await app.db_connection.execute(f"SELECT ProductID, ProductName FROM Products WHERE ProductID={id}")
     data = await cursor.fetchone()
-
+    response.status_code = status.HTTP_200_OK
     return {"id": data[0], "name":data[1]}
