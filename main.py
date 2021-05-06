@@ -1,18 +1,15 @@
-from fastapi import FastAPI, Response, status, Cookie
-from fastapi import Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Response, status, Cookie, Request, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi import Depends
 from fastapi.responses import PlainTextResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi import HTTPException
 import random
 import string
-
 import hashlib
 from datetime import date, timedelta
 from pydantic import BaseModel
 import pytest
-import json
+
+import aiosqlite
 
 app = FastAPI()
 app.counter = 0
@@ -289,6 +286,7 @@ def bar():
 # a.bar()
 
 
+# Wyklad 3, zadanie 3.1
 @app.get('/hello', response_class=HTMLResponse)
 def hello():
     return f"""
@@ -303,6 +301,7 @@ def hello():
         """
 
 
+# Wyklad 3, zadanie 3.2
 def get_random_string():
     letters = string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(30))
@@ -355,6 +354,7 @@ def read_current_user(response: Response, credentials: HTTPBasicCredentials = De
         return {"token": token_value}
 
 
+# Wyklad 3, zadanie 3.3
 @app.get("/welcome_session")
 def welcome_session(*, response: Response, session_token: str = Cookie(None), format: str = ""):
     if session_token not in app.login_session_tokens:
@@ -415,6 +415,7 @@ def welcome_token(response: Response, token: str = "", format: str = ""):
             return PlainTextResponse(content=result, status_code=200)
 
 
+# Wyklad 3, zadanie 3.4 oraz 3.5(usprawnienia)
 @app.delete("/logout_session")
 def logout_session(*, response: Response, session_token: str = Cookie(None), format: str = ""):
     if session_token not in app.login_session_tokens:
@@ -463,3 +464,32 @@ def logged_out(response: Response, format: str = ""):
     else:
         result = "Logged out!"
         return PlainTextResponse(content=result, status_code=200)
+
+
+# Wyklad 4
+@app.on_event("startup")
+async def startup():
+    app.db_connection = await aiosqlite.connect("northwind.db")
+    # app.db_connection.text_factory = lambda b: b.decode(errors="ignore")  # northwind specific
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await app.db_connection.close()
+
+
+# Wyklad 4, zadanie 4.2
+@app.get("/products/{id}")
+async def products(response: Response, id: int):
+    # znajdowanie najwiekszego id
+    cursor = await app.db_connection.execute(f"SELECT ProductID FROM Products ORDER BY ProductID DESC")
+    data = await cursor.fetchall()
+    max_id = data[0][0]
+
+    if id < 1 or id > max_id:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return response
+    cursor = await app.db_connection.execute(f"SELECT ProductID, ProductName FROM Products WHERE ProductID={id}")
+    data = await cursor.fetchone()
+
+    return {"id": data[0], "name":data[1]}
