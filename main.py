@@ -485,7 +485,7 @@ async def products(response: Response):
     app.db_connection.row_factory = aiosqlite.Row
     cursor = await app.db_connection.execute(
         """
-        SELECT CategoryID AS id, CategoryName AS name FROM Categories ORDER BY CategoryID
+        SELECT CategoryID AS "id", CategoryName AS "name" FROM Categories ORDER BY CategoryID
         """)
     data = await cursor.fetchall()
     return {
@@ -498,8 +498,8 @@ async def products(response: Response):
     app.db_connection.row_factory = aiosqlite.Row
     cursor = await app.db_connection.execute(
         """
-        SELECT CustomerID AS id, CompanyName AS name, 
-        Address || " " || PostalCode || " " ||City || " " || Country AS full_adress
+        SELECT CustomerID AS "id", CompanyName AS "name", 
+        Address || " " || PostalCode || " " ||City || " " || Country AS "full_adress"
         FROM Customers
         ORDER BY CustomerID
         """)
