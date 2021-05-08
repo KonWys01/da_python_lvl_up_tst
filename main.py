@@ -471,6 +471,7 @@ def logged_out(response: Response, format: str = ""):
 async def startup():
     app.db_connection = await aiosqlite.connect("northwind.db")
     app.db_connection.text_factory = lambda b: b.decode(errors="ignore")  # northwind specific
+    app.db_connection.row_factory = aiosqlite.Row
 
 
 @app.on_event("shutdown")
@@ -478,10 +479,36 @@ async def shutdown():
     await app.db_connection.close()
 
 
+# Wyklad 4, zadanie 4.1
+@app.get("/categories")
+async def products(response: Response):
+    cursor = await app.db_connection.execute(f"SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryID")
+    data = await cursor.fetchall()
+    return {
+        "categories": data
+    }
+
+
+@app.get("/customers")
+async def products(response: Response):
+    cursor = await app.db_connection.execute(
+        """
+        SELECT CustomerID, CompanyName, 
+        Address || " " || PostalCode || " " ||City || " " || Country AS full_adress
+        FROM Customers
+        ORDER BY CustomerID
+        """)
+    data = await cursor.fetchall()
+    return {
+        "categories": data
+    }
+
+
 # Wyklad 4, zadanie 4.2
 @app.get("/products/{id}")
 async def products(response: Response, id: int):
     # znajdowanie najwiekszego id
+
     cursor = await app.db_connection.execute(f"SELECT ProductID FROM Products ORDER BY ProductID DESC")
     data = await cursor.fetchall()
     max_id = data[0][0]
@@ -493,3 +520,5 @@ async def products(response: Response, id: int):
     data = await cursor.fetchone()
     response.status_code = status.HTTP_200_OK
     return {"id": data[0], "name":data[1]}
+
+
