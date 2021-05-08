@@ -471,7 +471,7 @@ def logged_out(response: Response, format: str = ""):
 async def startup():
     app.db_connection = await aiosqlite.connect("northwind.db")
     app.db_connection.text_factory = lambda b: b.decode(errors="ignore")  # northwind specific
-    app.db_connection.row_factory = aiosqlite.Row
+
 
 
 @app.on_event("shutdown")
@@ -482,26 +482,31 @@ async def shutdown():
 # Wyklad 4, zadanie 4.1
 @app.get("/categories")
 async def products(response: Response):
-    cursor = await app.db_connection.execute(f"SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryID")
+    app.db_connection.row_factory = aiosqlite.Row
+    cursor = await app.db_connection.execute(
+        """
+        SELECT CategoryID AS id, CategoryName AS name FROM Categories ORDER BY CategoryID
+        """)
     data = await cursor.fetchall()
     return {
-        "categories": data
+        "customers": data
     }
 
 
 @app.get("/customers")
 async def products(response: Response):
+    app.db_connection.row_factory = aiosqlite.Row
     cursor = await app.db_connection.execute(
         """
-        SELECT CustomerID, CompanyName, 
+        SELECT CustomerID AS id, CompanyName AS name, 
         Address || " " || PostalCode || " " ||City || " " || Country AS full_adress
         FROM Customers
         ORDER BY CustomerID
         """)
     data = await cursor.fetchall()
-    return {
-        "categories": data
-    }
+    # return {"id": data["CustomerID"], "name": data["CompanyName"], "full_adress": data["full_adress"]}
+    return {"customers": data}
+
 
 
 # Wyklad 4, zadanie 4.2
