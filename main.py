@@ -499,14 +499,12 @@ async def products(response: Response):
     cursor = await app.db_connection.execute(
         """
         SELECT CustomerID AS "id", CompanyName AS "name", 
-        Address || " " || PostalCode || " " ||City || " " || Country AS "full_adress"
+        Address || " " || PostalCode || " " ||City || " " || Country AS "full_address"
         FROM Customers
         ORDER BY CustomerID
         """)
     data = await cursor.fetchall()
-    # return {"id": data["CustomerID"], "name": data["CompanyName"], "full_adress": data["full_adress"]}
     return {"customers": data}
-
 
 
 # Wyklad 4, zadanie 4.2
