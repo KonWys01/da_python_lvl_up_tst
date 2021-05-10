@@ -504,7 +504,7 @@ async def customers(response: Response):
         SELECT CustomerID AS "id", CompanyName AS "name", 
         COALESCE(Address, '') || " " || COALESCE(PostalCode, '') || " " || COALESCE(City, '') || " " || COALESCE(Country, '') AS "full_address"
         FROM Customers
-        ORDER BY CustomerID;
+        ORDER BY UPPER(CustomerID);
         """)
     data = await cursor.fetchall()
     return {"customers": data}
