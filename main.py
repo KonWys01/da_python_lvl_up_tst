@@ -532,23 +532,26 @@ async def products(response: Response, id: int):
 @app.get("/employees")
 async def employees(response: Response, limit: int = 100, offset: int = 0, order: str = "EmployeeID"):
     app.db_connection.row_factory = aiosqlite.Row
-    if order != 'first_name' or order != 'last_name' or order != 'city':
+    if order == 'EmployeeID':
+        result = True
+    elif order != 'first_name' and order != 'last_name' and order != 'city':
         response.status_code = status.HTTP_400_BAD_REQUEST
-    elif order == 'first_name':
+        return response
+    if order == 'first_name':
         order = 'FirstName'
     elif order == 'last_name':
         order = 'LastName'
     elif order == 'city':
         order = 'City'
     cursor = await app.db_connection.execute(
-        """
-        SELECT EmployeeID AS id, LastName AS last_name, FirstName AS first_name, City AS city 
+        f"""
+        SELECT EmployeeID AS id, FirstName AS first_name, LastName AS last_name, City AS city 
         FROM Employees
-        ORDER BY UPPER(:order)
-        LIMIT :limit
-        OFFSET :offset
-        """, {'order': order, 'limit': limit, 'offset': offset})
+        ORDER BY UPPER ({order})
+        LIMIT {limit}
+        OFFSET ({offset});
+        """)
     data = await cursor.fetchall()
-    return {"customers": data}
+    return {"employees": data}
 
 
