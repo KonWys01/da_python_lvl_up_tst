@@ -482,6 +482,7 @@ async def shutdown():
 # Wyklad 4, zadanie 4.1
 @app.get("/categories")
 async def products(response: Response):
+    response.status_code = status.HTTP_200_OK
     app.db_connection.row_factory = aiosqlite.Row
     cursor = await app.db_connection.execute(
         """
@@ -495,6 +496,7 @@ async def products(response: Response):
 
 @app.get("/customers")
 async def products(response: Response):
+    response.status_code = status.HTTP_200_OK
     app.db_connection.row_factory = aiosqlite.Row
     cursor = await app.db_connection.execute(
         """
