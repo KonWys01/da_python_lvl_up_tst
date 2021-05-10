@@ -572,7 +572,7 @@ async def employees(response: Response):
 
 # Wyklad 4, zadanie 4.5
 @app.get("/products/{id}/orders")
-async def employees(response: Response, id: int):
+async def orders(response: Response, id: int):
 
     app.db_connection.row_factory = aiosqlite.Row
 
@@ -590,13 +590,13 @@ async def employees(response: Response, id: int):
 
     cursor = await app.db_connection.execute(
         f"""
-                SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
-                ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
-                FROM Orders, Customers, [Order Details]
-                WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID
-                ORDER BY (Orders.OrderID)  
-                LIMIT 1
-                """)
+            SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
+            ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
+            FROM Orders, Customers, [Order Details]
+            WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID
+            ORDER BY (Orders.OrderID)  
+            LIMIT 1
+            """)
     data = await cursor.fetchall()
     min_id = data[0]['id']
 
@@ -613,7 +613,7 @@ async def employees(response: Response, id: int):
         data = await cursor.fetchall()
         return {"orders": data}
     else:
-        response.status_code = status.HTTP_400_BAD_REQUEST
+        response.status_code = status.HTTP_404_NOT_FOUND
         return response
 
 
