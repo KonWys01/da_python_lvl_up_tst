@@ -490,7 +490,7 @@ async def products(response: Response):
         """)
     data = await cursor.fetchall()
     return {
-        "customers": data
+        "categories": data
     }
 
 
