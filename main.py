@@ -570,5 +570,51 @@ async def employees(response: Response):
     return {"products_extended": data}
 
 
+# Wyklad 4, zadanie 4.5
+@app.get("/products/{id}/orders")
+async def employees(response: Response, id: int):
+
+    app.db_connection.row_factory = aiosqlite.Row
+
+    cursor = await app.db_connection.execute(
+        f"""
+            SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
+            ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
+            FROM Orders, Customers, [Order Details]
+            WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID
+            ORDER BY (Orders.OrderID) DESC  
+            LIMIT 1
+            """)
+    data = await cursor.fetchall()
+    max_id = data[0]['id']
+
+    cursor = await app.db_connection.execute(
+        f"""
+                SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
+                ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
+                FROM Orders, Customers, [Order Details]
+                WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID
+                ORDER BY (Orders.OrderID)  
+                LIMIT 1
+                """)
+    data = await cursor.fetchall()
+    min_id = data[0]['id']
+
+    if max_id >= id >= min_id:
+        response.status_code = status.HTTP_200_OK
+        cursor = await app.db_connection.execute(
+            f"""
+                SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
+                ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
+                FROM Orders, Customers, [Order Details]
+                WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and Orders.OrderID = :id
+                GROUP BY Orders.OrderID
+                """, {'id': id})
+        data = await cursor.fetchall()
+        return {"orders": data}
+    else:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return response
+
 
 
