@@ -511,18 +511,16 @@ async def products(response: Response):
 
 # Wyklad 4, zadanie 4.2
 @app.get("/products/{id}")
-async def products(response: Response, id: str):
-    id = int(id)
+async def products(response: Response, id: int):
     # znajdowanie najwiekszego id
 
-    # cursor = await app.db_connection.execute(f"SELECT ProductID FROM Products ORDER BY ProductID DESC")
-    # data = await cursor.fetchall()
-    # max_id = data[0][0]
+    cursor = await app.db_connection.execute(f"SELECT ProductID FROM Products ORDER BY ProductID DESC")
+    data = await cursor.fetchall()
+    max_id = data[0][0]
 
-    if id < 1 or id > 77:
+    if id < 1 or id > max_id:
         response.status_code = status.HTTP_404_NOT_FOUND
         return response
-    # cursor = await app.db_connection.execute(f"SELECT ProductID, ProductName FROM Products WHERE ProductID={id}")
     cursor = await app.db_connection.execute("SELECT ProductID, ProductName FROM Products WHERE ProductID=:id", {'id': id})
     data = await cursor.fetchone()
     response.status_code = status.HTTP_200_OK
