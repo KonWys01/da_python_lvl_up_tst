@@ -498,12 +498,13 @@ async def categories(response: Response):
 async def customers(response: Response):
     response.status_code = status.HTTP_200_OK
     app.db_connection.row_factory = aiosqlite.Row
+    # COALESCE zamienia nulla na pusty string
     cursor = await app.db_connection.execute(
         """
         SELECT CustomerID AS "id", CompanyName AS "name", 
-        Address || " " || PostalCode || " " ||City || " " || Country AS "full_address"
+        COALESCE(Address, '') || " " || COALESCE(PostalCode, '') || " " || COALESCE(City, '') || " " || COALESCE(Country, '') AS "full_address"
         FROM Customers
-        ORDER BY CustomerID
+        ORDER BY CustomerID;
         """)
     data = await cursor.fetchall()
     return {"customers": data}
