@@ -567,7 +567,7 @@ async def employees(response: Response):
             ORDER BY Products.ProductID
             """)
     data = await cursor.fetchall()
-    return {"employees": data}
+    return {"products_extended": data}
 
 
 
