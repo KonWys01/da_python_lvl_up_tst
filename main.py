@@ -555,3 +555,20 @@ async def employees(response: Response, limit: int = 100, offset: int = 0, order
     return {"employees": data}
 
 
+# Wyklad 4, zadanie 4.4
+@app.get("/products_extended")
+async def employees(response: Response):
+    app.db_connection.row_factory = aiosqlite.Row
+    cursor = await app.db_connection.execute(
+        f"""
+            SELECT Products.ProductID AS id, Products.ProductName AS name, Categories.CategoryName AS category, Suppliers.CompanyName AS supplier 
+            FROM Products, Categories, Suppliers
+            WHERE Products.CategoryID = Categories.CategoryID and Products.SupplierID = Suppliers.SupplierID
+            ORDER BY Products.ProductID
+            """)
+    data = await cursor.fetchall()
+    return {"employees": data}
+
+
+
+
