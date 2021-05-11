@@ -608,6 +608,7 @@ async def orders(response: Response, id: int):
                 ROUND(([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)),2) AS total_price
                 FROM Orders, Customers, [Order Details]
                 WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and Orders.OrderID = :id
+                
                 """, {'id': id})
         data = await cursor.fetchall()
         return {"orders": data}
@@ -698,7 +699,8 @@ async def categories_6(response: Response, id: int):
             delete from Categories
             where CategoryID =:id
             """, {'id': id})
-        return {"deleted": id}
+        app.db_connection.commit()
+        return {"deleted": 1}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return response
