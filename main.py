@@ -578,8 +578,8 @@ async def orders(response: Response, id: int):
         """
         SELECT EXISTS(SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
                 ROUND(([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)),2) AS total_price
-                FROM Orders, Customers, [Order Details]
-                WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and Orders.OrderID = :id) as if_exist
+                FROM Orders, Customers, [Order Details], Products
+                WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and [Order Details].ProductID = :id) as if_exist
         """, {'id': id})
     data = await cursor.fetchall()
     if_exist = data[0]['if_exist']
@@ -589,7 +589,7 @@ async def orders(response: Response, id: int):
                 SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
                 ROUND(([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)),2) AS total_price
                 FROM Orders, Customers, [Order Details]
-                WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and Orders.OrderID = :id
+                WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and [Order Details].ProductID = :id
                 
                 """, {'id': id})
         data = await cursor.fetchall()
