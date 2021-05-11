@@ -571,7 +571,7 @@ async def employees(response: Response):
 
 
 # Wyklad 4, zadanie 4.5
-@app.get("/products/{id}/orders")
+@app.get("/products/{id}/orders", response_class=JSONResponse)
 async def orders(response: Response, id: int):
 
     app.db_connection.row_factory = aiosqlite.Row
