@@ -680,3 +680,28 @@ async def categories_6(response: Response, id: int,  category: CategoriesID):
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return response
+
+
+@app.delete("/categories/{id}")
+async def categories_6(response: Response, id: int):
+    app.db_connection.row_factory = aiosqlite.Row
+
+    cursor = await app.db_connection.execute(
+        """
+        SELECT EXISTS(SELECT 1 FROM Categories WHERE CategoryID=:id) as if_exist
+        """, {'id': id})
+    data = await cursor.fetchall()
+    if_exist = data[0]['if_exist']
+    if if_exist == 1:
+
+        cursor = await app.db_connection.execute(
+            """
+            delete from Categories
+            where CategoryID =:id
+            """, {'id': id})
+        return {"deleted": id}
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return response
+
+
