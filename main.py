@@ -571,7 +571,7 @@ async def employees(response: Response):
 
 
 # Wyklad 4, zadanie 4.5
-@app.get("/products/{id}/orders", response_class=JSONResponse)
+@app.get("/products/{id}/orders", status_code=200)
 async def orders(response: Response, id: int):
 
     app.db_connection.row_factory = aiosqlite.Row
@@ -601,7 +601,6 @@ async def orders(response: Response, id: int):
     min_id = data[0]['id']
 
     if max_id >= id >= min_id:
-        response.status_code = status.HTTP_200_OK
         cursor = await app.db_connection.execute(
             f"""
                 SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
@@ -613,8 +612,7 @@ async def orders(response: Response, id: int):
         data = await cursor.fetchall()
         return {"orders": data}
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return response
+        raise HTTPException(status_code=404)
 
 
 # Wyklad 4, zadanie 4.6
