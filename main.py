@@ -617,4 +617,54 @@ async def orders(response: Response, id: int):
         return response
 
 
+# Wyklad 4, zadanie 4.6
+class Categories(BaseModel):
+    name: str
 
+
+@app.post("/categories")
+async def categories_6(response: Response, category: Categories):
+    app.db_connection.row_factory = aiosqlite.Row
+    cursor = await app.db_connection.execute(
+        f"""
+            INSERT INTO Categories (CategoryName)
+            VALUES(:category_name)
+            """, {'category_name': category.name})
+    data = await cursor.fetchall()
+
+    cursor = await app.db_connection.execute(
+        f"""
+           Select CategoryID as id, CategoryName as name
+           from Categories 
+           Order by CategoryID DESC
+           limit 1
+        """)
+    data = await cursor.fetchall()
+    response.status_code = status.HTTP_201_CREATED
+    return data[0]
+
+
+class CategoriesID(BaseModel):
+    name: str
+
+
+# @app.put("/categories/{id}")
+# async def categories_6(response: Response, id: str,  category: Categories):
+#     app.db_connection.row_factory = aiosqlite.Row
+#     cursor = await app.db_connection.execute(
+#         f"""
+#             INSERT INTO Categories (CategoryName)
+#             VALUES(:category_name)
+#             """, {'category_name': category.name})
+#     data = await cursor.fetchall()
+#
+#     cursor = await app.db_connection.execute(
+#         f"""
+#            Select CategoryID as id, CategoryName as name
+#            from Categories
+#            Order by CategoryID DESC
+#            limit 1
+#         """)
+#     data = await cursor.fetchall()
+#     response.status_code = status.HTTP_201_CREATED
+#     return data[0]
