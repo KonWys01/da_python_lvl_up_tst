@@ -690,7 +690,7 @@ async def categories_6(response: Response, id: int):
         """
         SELECT EXISTS(SELECT 1 FROM Categories WHERE CategoryID=:id) as if_exist
         """, {'id': id})
-    data = await cursor.fetchall()
+    data = cursor.fetchall()
     if_exist = data[0]['if_exist']
     if if_exist == 1:
         response.status_code = status.HTTP_200_OK
