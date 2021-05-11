@@ -608,7 +608,6 @@ async def orders(response: Response, id: int):
                 ROUND(([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)),2) AS total_price
                 FROM Orders, Customers, [Order Details]
                 WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and Orders.OrderID = :id
-                GROUP BY Orders.OrderID
                 """, {'id': id})
         data = await cursor.fetchall()
         return {"orders": data}
