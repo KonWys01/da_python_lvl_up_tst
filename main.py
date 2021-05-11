@@ -629,7 +629,7 @@ async def categories_6(response: Response, category: Categories):
         f"""
             INSERT INTO Categories (CategoryName)
             VALUES(:category_name)
-            """, {'category_name': category.name})
+            """, {'category_name': "New"+category.name})
     data = await cursor.fetchall()
 
     cursor = await app.db_connection.execute(
