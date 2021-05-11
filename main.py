@@ -682,7 +682,7 @@ async def categories_6(response: Response, id: int,  category: CategoriesID):
         return response
 
 
-@app.delete("/categories/{id}", response_class=JSONResponse)
+@app.delete("/categories/{id}")
 async def categories_6(response: Response, id: int):
     app.db_connection.row_factory = aiosqlite.Row
 
@@ -699,7 +699,9 @@ async def categories_6(response: Response, id: int):
             delete from Categories
             where CategoryID =:id
             """, {'id': id})
-        return {"deleted": 1}
+        data = await cursor.fetchall()
+        result = 1
+        return {"deleted": result}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return response
