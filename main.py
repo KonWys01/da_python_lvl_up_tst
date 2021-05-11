@@ -649,7 +649,7 @@ class CategoriesID(BaseModel):
 
 
 @app.put("/categories/{id}")
-async def categories_6(response: Response, id: int,  category: Categories):
+async def categories_6(response: Response, id: int,  category: CategoriesID):
     app.db_connection.row_factory = aiosqlite.Row
 
     cursor = await app.db_connection.execute(
