@@ -595,7 +595,7 @@ async def orders(response: Response, id: int):
         data = await cursor.fetchall()
         return {"orders": data}
     else:
-        raise HTTPException(status_code=404)
+        response.status_code = status.HTTP_404_NOT_FOUND
 
 
 # Wyklad 4, zadanie 4.6
