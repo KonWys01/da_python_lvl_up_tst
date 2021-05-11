@@ -693,13 +693,13 @@ async def categories_6(response: Response, id: int):
     data = await cursor.fetchall()
     if_exist = data[0]['if_exist']
     if if_exist == 1:
-        # response.status_code = status.HTTP_200_OK
+        response.status_code = status.HTTP_200_OK
         cursor = app.db_connection.execute(
             """
             delete from Categories
             where CategoryID =:id
             """, {'id': id})
-        data = await cursor.fetchall()
+        data = cursor.fetchall()
         return {"deleted": 1}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
