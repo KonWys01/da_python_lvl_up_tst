@@ -573,34 +573,17 @@ async def employees(response: Response):
 # Wyklad 4, zadanie 4.5
 @app.get("/products/{id}/orders", status_code=200)
 async def orders(response: Response, id: int):
-
     app.db_connection.row_factory = aiosqlite.Row
-
     cursor = await app.db_connection.execute(
-        f"""
-            SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
-            ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
-            FROM Orders, Customers, [Order Details]
-            WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID
-            ORDER BY (Orders.OrderID) DESC  
-            LIMIT 1
-            """)
+        """
+        SELECT EXISTS(SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
+                ROUND(([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)),2) AS total_price
+                FROM Orders, Customers, [Order Details]
+                WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and Orders.OrderID = :id) as if_exist
+        """, {'id': id})
     data = await cursor.fetchall()
-    max_id = data[0]['id']
-
-    cursor = await app.db_connection.execute(
-        f"""
-            SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
-            ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
-            FROM Orders, Customers, [Order Details]
-            WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID
-            ORDER BY (Orders.OrderID)  
-            LIMIT 1
-            """)
-    data = await cursor.fetchall()
-    min_id = data[0]['id']
-
-    if max_id >= id >= min_id:
+    if_exist = data[0]['if_exist']
+    if if_exist == 1:
         cursor = await app.db_connection.execute(
             f"""
                 SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
