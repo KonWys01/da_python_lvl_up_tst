@@ -648,23 +648,35 @@ class CategoriesID(BaseModel):
     name: str
 
 
-# @app.put("/categories/{id}")
-# async def categories_6(response: Response, id: str,  category: Categories):
-#     app.db_connection.row_factory = aiosqlite.Row
-#     cursor = await app.db_connection.execute(
-#         f"""
-#             INSERT INTO Categories (CategoryName)
-#             VALUES(:category_name)
-#             """, {'category_name': category.name})
-#     data = await cursor.fetchall()
-#
-#     cursor = await app.db_connection.execute(
-#         f"""
-#            Select CategoryID as id, CategoryName as name
-#            from Categories
-#            Order by CategoryID DESC
-#            limit 1
-#         """)
-#     data = await cursor.fetchall()
-#     response.status_code = status.HTTP_201_CREATED
-#     return data[0]
+@app.put("/categories/{id}")
+async def categories_6(response: Response, id: int,  category: Categories):
+    app.db_connection.row_factory = aiosqlite.Row
+
+    cursor = await app.db_connection.execute(
+    """
+    SELECT EXISTS(SELECT 1 FROM Categories WHERE CategoryID=:id) as if_exist
+    """, {'id': id})
+    data = await cursor.fetchall()
+    if_exist = data[0]['if_exist']
+    if if_exist == 1:
+        cursor = await app.db_connection.execute(
+            f"""
+               update Categories
+               set CategoryName = :name
+               where CategoryID = :id
+            """, {'name': category.name, "id": id})
+        data = await cursor.fetchall()
+
+        cursor = await app.db_connection.execute(
+            f"""
+                select CategoryID as id, CategoryName as name
+                from Categories
+                where CategoryID = :id
+            """, {"id": id})
+        data = await cursor.fetchall()
+
+        response.status_code = status.HTTP_200_OK
+        return data[0]
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return response
