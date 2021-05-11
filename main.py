@@ -701,7 +701,7 @@ async def categories_6(response: Response, id: int):
             """, {'id': id})
         data = await cursor.fetchall()
         result = 1
-        return {"deleted": result}
+        return {"deleted": id}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return response
