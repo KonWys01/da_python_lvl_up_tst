@@ -605,7 +605,7 @@ async def orders(response: Response, id: int):
         cursor = await app.db_connection.execute(
             f"""
                 SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
-                ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
+                ROUND(([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)),2) AS total_price
                 FROM Orders, Customers, [Order Details]
                 WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and Orders.OrderID = :id
                 GROUP BY Orders.OrderID
