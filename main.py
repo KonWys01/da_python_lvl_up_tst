@@ -576,7 +576,7 @@ async def orders(response: Response, id: int):
 
     app.db_connection.row_factory = aiosqlite.Row
 
-    cursor = await app.db_connection.execute(
+    cursor = app.db_connection.execute(
         f"""
             SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
             ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
@@ -585,10 +585,10 @@ async def orders(response: Response, id: int):
             ORDER BY (Orders.OrderID) DESC  
             LIMIT 1
             """)
-    data = await cursor.fetchall()
+    data = cursor.fetchall()
     max_id = data[0]['id']
 
-    cursor = await app.db_connection.execute(
+    cursor = app.db_connection.execute(
         f"""
             SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
             ([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)) AS total_price
@@ -597,12 +597,12 @@ async def orders(response: Response, id: int):
             ORDER BY (Orders.OrderID)  
             LIMIT 1
             """)
-    data = await cursor.fetchall()
+    data = cursor.fetchall()
     min_id = data[0]['id']
 
     if max_id >= id >= min_id:
         response.status_code = status.HTTP_200_OK
-        cursor = await app.db_connection.execute(
+        cursor = app.db_connection.execute(
             f"""
                 SELECT Orders.OrderID AS id, Customers.CompanyName AS customer, [Order Details].Quantity AS quantity,
                 ROUND(([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * ([Order Details].UnitPrice * [Order Details].Quantity)),2) AS total_price
@@ -610,7 +610,7 @@ async def orders(response: Response, id: int):
                 WHERE Orders.CustomerID = Customers.CustomerID and Orders.OrderID = [Order Details].OrderID and Orders.OrderID = :id
                 GROUP BY Orders.OrderID
                 """, {'id': id})
-        data = await cursor.fetchall()
+        data = cursor.fetchall()
         return {"orders": data}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
