@@ -700,8 +700,8 @@ async def categories_6(response: Response, id: int):
             where CategoryID =:id
             """, {'id': id})
         data = await cursor.fetchall()
-        result = 1
-        return {"deleted": id}
+        json = {"deleted": 1}
+        return JSONResponse(content=json)
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return response
