@@ -682,7 +682,7 @@ async def categories_6(response: Response, id: int,  category: CategoriesID):
         return response
 
 
-@app.delete("/categories/{id}")
+@app.delete("/categories/{id}", status_code=200)
 async def categories_6(response: Response, id: int):
     app.db_connection.row_factory = aiosqlite.Row
 
