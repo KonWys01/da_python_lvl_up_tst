@@ -62,6 +62,5 @@ async def post_suppliers(response: Response, id: PositiveInt, supplier: schemas.
     if crud.put_suppliers(db, id, supplier):
         response.status_code = status.HTTP_200_OK
         return crud.put_suppliers(db, id, supplier)
-    response.status_code = status.HTTP_404_NOT_FOUND
-    return response
+    raise HTTPException(status_code=404, detail="Supplier not found")
 
