@@ -58,3 +58,35 @@ class Product(BaseModel):
         orm_mode = True
 
 
+# Wyklad 5, zadanie 5.3
+class SupplierPost(BaseModel):
+    CompanyName: Optional[str]
+    ContactName: Optional[str]
+    ContactTitle: Optional[str]
+    Address: Optional[str]
+    City: Optional[str]
+    PostalCode: Optional[str]
+    Country: Optional[str]
+    Phone: Optional[str]
+
+    class Config:
+        orm_mode = True
+
+
+class SupplierPostReturn(BaseModel):
+    SupplierID: PositiveInt
+    CompanyName: str
+    ContactName: Optional[str]
+    ContactTitle: Optional[str]
+    Address: Optional[str]
+    City: Optional[str]
+    Region: Optional[str]
+    PostalCode: Optional[str]
+    Country: Optional[str]
+    Phone: Optional[str]
+    Fax: Optional[str] = None
+    HomePage: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
