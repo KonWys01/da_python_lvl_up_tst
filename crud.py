@@ -71,5 +71,7 @@ def delete_suppliers(db: Session, id_of_supplier: int, supplier: schemas.Supplie
     if id_exist:
         db.query(models.Supplier).filter(models.Supplier.SupplierID == id_of_supplier).delete()
         db.commit()
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
