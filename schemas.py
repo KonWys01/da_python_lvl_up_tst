@@ -90,3 +90,12 @@ class SupplierPostReturn(BaseModel):
     class Config:
         orm_mode = True
 
+
+# Wyklad 5, zadanie 5.4
+class SupplierPut(BaseModel):
+    CompanyName: Optional[str]
+    ContactName: Optional[str]
+
+    class Config:
+        orm_mode = True
+
