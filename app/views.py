@@ -32,5 +32,5 @@ async def get_suppliers(db: Session = Depends(get_db)):
 async def get_one_supplier(supplier_id: PositiveInt, db: Session = Depends(get_db)):
     db_supplier = crud.get_one_supplier(db, supplier_id)
     if db_supplier is None:
-        raise HTTPException(status_code=404, detail="Shipper not found")
+        raise HTTPException(status_code=404, detail="Supplier not found")
     return db_supplier

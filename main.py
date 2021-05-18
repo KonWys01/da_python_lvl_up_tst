@@ -2,6 +2,17 @@ from fastapi import FastAPI, Response, status, Cookie, Request, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import PlainTextResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi import HTTPException
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import os
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import PositiveInt
+from sqlalchemy.orm import Session
+
+# from . import crud, schemas
+# from .database import get_db
+
 import random
 import string
 import hashlib
@@ -683,5 +694,11 @@ async def categories_6(response: Response, id: int):
         return {"deleted": 1}
     else:
         raise HTTPException(status_code=404)
+
+
+# Wyklad 5, zadanie 5.1
+
+
+
 
 
