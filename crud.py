@@ -56,11 +56,11 @@ def post_suppliers(db: Session, supplier: schemas.SupplierPost):
 def put_suppliers(db: Session, id_of_supplier: int, supplier: schemas.SupplierPut):
 
     attributes_to_update = {key: value for key, value in supplier.dict(exclude={'id_of_supplier'}).items()
-                         if value is not None}
+                            if value is not None}
     if attributes_to_update != {}:
         db.execute(update(models.Supplier).where(models.Supplier.SupplierID == id_of_supplier).
                    values(**attributes_to_update))
         db.commit()
-    return get_one_supplier(db, supplier_id=id_of_supplier)
+    return get_one_supplier(db, id_of_supplier)
 
 
