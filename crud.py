@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
 from sqlalchemy import func, update
 # from . import models
 import models, schemas
@@ -63,4 +64,12 @@ def put_suppliers(db: Session, id_of_supplier: int, supplier: schemas.SupplierPu
         db.commit()
     return get_one_supplier(db, id_of_supplier)
 
+
+# Wyklad 5, zadanie 5.5
+def delete_suppliers(db: Session, id_of_supplier: int, supplier: schemas.SupplierPut):
+    id_exist = get_one_supplier(db, id_of_supplier)
+    if id_exist:
+        db.query(models.Supplier).filter(models.Supplier.SupplierID == id_of_supplier).delete()
+        db.commit()
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 

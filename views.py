@@ -64,3 +64,9 @@ async def post_suppliers(response: Response, id: PositiveInt, supplier: schemas.
         return crud.put_suppliers(db, id, supplier)
     raise HTTPException(status_code=404, detail="Supplier not found")
 
+
+# Wyklad 5, zadanie 5.5
+@router.delete("/suppliers/{id}")
+async def delete_suppliers(id: PositiveInt, supplier: schemas.SupplierPut, db: Session = Depends(get_db)):
+    crud.delete_suppliers(db, id, supplier)
+
