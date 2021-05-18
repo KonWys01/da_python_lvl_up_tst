@@ -42,7 +42,7 @@ class Supplier(BaseModel):
 # Wyklad 5, zadanie 5.2
 class Category(BaseModel):
     CategoryID: PositiveInt
-    CategoryName: Optional[str]
+    CategoryName: str
 
     class Config:
         orm_mode = True
@@ -50,9 +50,9 @@ class Category(BaseModel):
 
 class Product(BaseModel):
     ProductID: PositiveInt
-    ProductName: Optional[str]
+    ProductName: str
     Category: Optional[Category]
-    Discontinued: Optional[int]
+    Discontinued: int
 
     class Config:
         orm_mode = True
