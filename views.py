@@ -57,12 +57,11 @@ async def post_suppliers(response: Response, supplier: schemas.SupplierPost, db:
 
 
 # Wyklad 5, zadanie 5.4
-@router.put("/suppliers/{id}")
+@router.put("/suppliers/{id}", response_model=schemas.Supplier)
 async def post_suppliers(response: Response, id: PositiveInt, supplier: schemas.SupplierPut, db: Session = Depends(get_db)):
     if crud.put_suppliers(db, id, supplier):
         response.status_code = status.HTTP_200_OK
         return crud.put_suppliers(db, id, supplier)
     response.status_code = status.HTTP_404_NOT_FOUND
     return 'Test Title'
-    return response
 
