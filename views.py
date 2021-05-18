@@ -67,6 +67,9 @@ async def post_suppliers(response: Response, id: PositiveInt, supplier: schemas.
 
 # Wyklad 5, zadanie 5.5
 @router.delete("/suppliers/{id}")
-async def delete_suppliers(id: PositiveInt, supplier: schemas.SupplierPut, db: Session = Depends(get_db)):
-    crud.delete_suppliers(db, id, supplier)
+async def delete_suppliers(response: Response, id: PositiveInt, supplier: schemas.SupplierPut, db: Session = Depends(get_db)):
+    response.status_code = status.HTTP_204_NO_CONTENT
+    return crud.delete_suppliers(db, id, supplier)
+
+
 
