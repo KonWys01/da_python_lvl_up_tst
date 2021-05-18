@@ -23,7 +23,7 @@ async def get_shippers(db: Session = Depends(get_db)):
     return crud.get_shippers(db)
 
 
-@router.get("/suppliers", response_model=List[schemas.Supplier])
+@router.get("/suppliers", response_model=List[schemas.Suppliers])
 async def get_suppliers(db: Session = Depends(get_db)):
     return crud.get_suppliers(db)
 

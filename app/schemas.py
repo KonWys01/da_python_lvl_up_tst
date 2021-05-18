@@ -11,6 +11,14 @@ class Shipper(BaseModel):
         orm_mode = True
 
 
+class Suppliers(BaseModel):
+    SupplierID: PositiveInt
+    CompanyName: Optional[str]
+
+    class Config:
+        orm_mode = True
+
+
 class Supplier(BaseModel):
     SupplierID: PositiveInt
     CompanyName: Optional[str]
