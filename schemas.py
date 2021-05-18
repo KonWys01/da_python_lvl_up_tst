@@ -40,7 +40,7 @@ class Supplier(BaseModel):
 
 
 # Wyklad 5, zadanie 5.2
-class Category(BaseModel):
+class CategoryID(BaseModel):
     CategoryID: PositiveInt
     CategoryName: str
 
@@ -51,7 +51,7 @@ class Category(BaseModel):
 class Product(BaseModel):
     ProductID: PositiveInt
     ProductName: str
-    Category: Optional[Category]
+    Category: Optional[CategoryID]
     Discontinued: int
 
     class Config:

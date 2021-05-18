@@ -3,6 +3,7 @@ from fastapi import HTTPException, status, Response
 from sqlalchemy import func, update
 # from . import models
 import models, schemas
+from database import get_db
 
 
 # Wyklad 5, przyklad
@@ -29,16 +30,14 @@ def get_one_supplier(db: Session, supplier_id: int):
 
 # Wyklad 5, zadanie 5.2
 def get_products_with_supplier(db: Session, supplier_id: int):
-    return (
-        db.query(models.Product).filter(models.Product.SupplierID == supplier_id).order_by(models.Product.ProductID.desc()).all()
-    )
+    return db.query(models.Product).filter(models.Product.SupplierID == supplier_id).order_by(models.Product.ProductID.desc()).all()
 
 
 # Wyklad 5, zadanie 5.3
 def post_suppliers(db: Session, supplier: schemas.SupplierPost):
     id_to_add = db.query(func.max(models.Supplier.SupplierID)).scalar() + 1
     supplier_with_id = models.Supplier(
-        SupplierID = id_to_add,
+        SupplierID=id_to_add,
         CompanyName=supplier.CompanyName,
         ContactName=supplier.ContactName,
         ContactTitle=supplier.ContactTitle,
@@ -66,13 +65,10 @@ def put_suppliers(db: Session, id_of_supplier: int, supplier: schemas.SupplierPu
 
 
 # Wyklad 5, zadanie 5.5
-def delete_suppliers(response: Response, db: Session, id_of_supplier: int):
-    id_exist = get_one_supplier(db, id_of_supplier)
-    if id_exist:
-        db.query(models.Supplier).filter(models.Supplier.SupplierID == id_of_supplier).delete()
-        db.commit()
-        response.status_code = status.HTTP_204_NO_CONTENT
-        return response
-    else:
+def delete_suppliers(db: Session, id_of_supplier: int):
+    check_supplier = get_one_supplier(db, id_of_supplier)
+    if not check_supplier:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    db.query(models.Supplier).filter(models.Supplier.SupplierID == id_of_supplier).delete()
+    db.commit()
 

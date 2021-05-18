@@ -44,9 +44,9 @@ async def get_one_supplier(supplier_id: PositiveInt, db: Session = Depends(get_d
 @router.get("/suppliers/{supplier_id}/products", response_model=List[schemas.Product])
 async def get_products_with_supplier(supplier_id: PositiveInt, db: Session = Depends(get_db)):
     db_product = crud.get_products_with_supplier(db, supplier_id)
-    if db_product:
-        return db_product
-    raise HTTPException(status_code=404, detail="Supplier not found")
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    return db_product
 
 
 # Wyklad 5, zadanie 5.3
@@ -66,10 +66,9 @@ async def post_suppliers(response: Response, id: PositiveInt, supplier: schemas.
 
 
 # Wyklad 5, zadanie 5.5
-@router.delete("/suppliers/{id}")
-async def delete_suppliers(response: Response, id: PositiveInt, db: Session = Depends(get_db)):
-    response.status_code = status.HTTP_204_NO_CONTENT
-    return crud.delete_suppliers(db, id)
+@router.delete("/suppliers/{id_of_supplier}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_suppliers(id_of_supplier: int, db: Session = Depends(get_db)):
+    crud.delete_suppliers(db, id_of_supplier)
 
 
 
